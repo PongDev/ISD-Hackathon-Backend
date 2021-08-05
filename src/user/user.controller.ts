@@ -8,8 +8,8 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Post('register')
-  register(@Body() registerUser: UserDTO) {
-    return this.userService.registerUser(registerUser);
+  async register(@Body() registerUser: UserDTO) {
+    return await this.userService.registerUser(registerUser);
   }
 
   @Put('changepassword')

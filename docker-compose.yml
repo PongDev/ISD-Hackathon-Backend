@@ -10,6 +10,8 @@ services:
     environment:
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - ${DB_PORT}:3306
   phpmyadmin:
     image: phpmyadmin
     container_name: phpmyadmin
