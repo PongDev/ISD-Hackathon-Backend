@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ChangePasswordDTO } from './dto/change-password.dto';
@@ -6,6 +12,8 @@ import { UserDTO } from './dto/user.dto';
 import { User } from './user.entity';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
+import { AccessTokenDTO } from '../auth/dto/access-token.dto';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UserService {
@@ -13,14 +21,18 @@ export class UserService {
     private configService: ConfigService,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @Inject(forwardRef(() => AuthService))
+    private authService: AuthService,
   ) {}
 
-  async registerUser(registerUser: UserDTO) {
+  async findUser(username: string): Promise<User> {
+    return await this.userRepository.findOne(username);
+  }
+
+  async registerUser(registerUser: UserDTO): Promise<string> {
     const saltRound = parseInt(this.configService.get<string>('SALT_ROUND'));
     const isUserExist =
-      (await this.userRepository.findOne(registerUser.username)) === undefined
-        ? false
-        : true;
+      (await this.findUser(registerUser.username)) === undefined ? false : true;
 
     if (isUserExist) {
       throw new HttpException('User Already Exist', HttpStatus.BAD_REQUEST);
@@ -32,11 +44,41 @@ export class UserService {
     return `Register Complete`;
   }
 
-  changeUserPassword(changePasswordData: ChangePasswordDTO) {
-    return `change password route\nOld Password: ${changePasswordData.oldPassword}\nNew Password: ${changePasswordData.newPassword}`;
+  async changeUserPassword(
+    username: string,
+    changePasswordData: ChangePasswordDTO,
+  ): Promise<string> {
+    const saltRound = parseInt(this.configService.get<string>('SALT_ROUND'));
+    const user = await this.findUser(username);
+
+    if (
+      !user ||
+      !(await bcrypt.compare(changePasswordData.oldPassword, user.password))
+    ) {
+      throw new HttpException(
+        'User Not Found Or Password Incorrect',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    this.userRepository.update(
+      { username: username },
+      {
+        password: await bcrypt.hash(changePasswordData.newPassword, saltRound),
+      },
+    );
+    return 'Change Password Complete';
   }
 
-  login(loginUser: UserDTO) {
-    return `login route\nUser: ${loginUser.username}\nPassword: ${loginUser.password}`;
+  async login(loginUser: UserDTO): Promise<AccessTokenDTO> {
+    const accessToken = await this.authService.login(
+      loginUser.username,
+      loginUser.password,
+    );
+
+    if (accessToken === null) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    } else {
+      return accessToken;
+    }
   }
 }
