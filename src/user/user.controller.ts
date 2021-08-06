@@ -19,6 +19,13 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private userService: UserService) {}
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get('displayName')
+  async getDisplayName(@Request() req) {
+    return (await this.userService.findUser(req.user.email)).displayName;
+  }
+
   @Post('register')
   async register(@Body() registerUser: UserDTO) {
     return await this.userService.registerUser(registerUser);
