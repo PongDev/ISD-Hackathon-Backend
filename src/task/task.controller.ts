@@ -8,7 +8,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { AddTaskDTO } from './dto/add-task.dto';
 import { EditTaskDTO } from './dto/edit-task.dto';
@@ -32,6 +32,7 @@ export class TaskController {
   }
 
   @Delete('delete/:id')
+  @ApiParam({ name: 'id', required: true })
   async deleteTask(@Request() req, @Param() params) {
     return await this.taskService.deleteTask(req.user.email, params.id);
   }

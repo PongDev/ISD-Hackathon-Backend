@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProjectService } from 'src/project/project.service';
 import { Repository } from 'typeorm';
@@ -11,14 +17,16 @@ export class TaskService {
   constructor(
     @InjectRepository(Task)
     private taskRepository: Repository<Task>,
+    @Inject(forwardRef(() => ProjectService))
     private projectService: ProjectService,
   ) {}
 
   async addTask(email: string, addTaskData: AddTaskDTO): Promise<string> {
-    const taskData = await this.taskRepository.findOne(addTaskData.projectID);
-
     if (
-      !this.projectService.isUserAllowAccessProject(email, taskData.projectID)
+      !(await this.projectService.isUserAllowAccessProject(
+        email,
+        addTaskData.projectID,
+      ))
     ) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
@@ -30,7 +38,11 @@ export class TaskService {
     const taskData = await this.taskRepository.findOne(editTaskData.projectID);
 
     if (
-      !this.projectService.isUserAllowAccessProject(email, taskData.projectID)
+      !taskData ||
+      !(await this.projectService.isUserAllowAccessProject(
+        email,
+        taskData.projectID,
+      ))
     ) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
@@ -42,7 +54,11 @@ export class TaskService {
     const taskData = await this.taskRepository.findOne(taskID);
 
     if (
-      !this.projectService.isUserAllowAccessProject(email, taskData.projectID)
+      !taskData ||
+      !(await this.projectService.isUserAllowAccessProject(
+        email,
+        taskData.projectID,
+      ))
     ) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
@@ -51,7 +67,9 @@ export class TaskService {
   }
 
   async taskList(email: string, projectID: number): Promise<Task[]> {
-    if (!this.projectService.isUserAllowAccessProject(email, projectID)) {
+    if (
+      !(await this.projectService.isUserAllowAccessProject(email, projectID))
+    ) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
     return await this.taskRepository.find({
@@ -63,5 +81,9 @@ export class TaskService {
         priority: 'DESC',
       },
     });
+  }
+
+  async removeProjectTask(projectID: number): Promise<void> {
+    await this.taskRepository.delete({ projectID: projectID });
   }
 }
