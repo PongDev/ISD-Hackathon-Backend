@@ -44,4 +44,17 @@ export class ProjectService {
       return e.member.includes(username);
     });
   }
+
+  async isUserAllowAccessProject(
+    username: string,
+    projectID: number,
+  ): Promise<boolean> {
+    const projectData = await this.projectRepository.findOne(projectID);
+
+    if (!projectData || !projectData.member.includes(username)) {
+      return false;
+    } else {
+      return true;
+    }
+  }
 }
