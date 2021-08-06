@@ -28,31 +28,31 @@ export class UserService {
     private projectService: ProjectService,
   ) {}
 
-  async findUser(username: string): Promise<User> {
-    return await this.userRepository.findOne(username);
+  async findUser(email: string): Promise<User> {
+    return await this.userRepository.findOne(email);
   }
 
   async registerUser(registerUser: UserDTO): Promise<string> {
     const saltRound = parseInt(this.configService.get<string>('SALT_ROUND'));
     const isUserExist =
-      (await this.findUser(registerUser.username)) === undefined ? false : true;
+      (await this.findUser(registerUser.email)) === undefined ? false : true;
 
     if (isUserExist) {
       throw new HttpException('User Already Exist', HttpStatus.BAD_REQUEST);
     }
     await this.userRepository.insert({
-      username: registerUser.username,
+      email: registerUser.email,
       password: await bcrypt.hash(registerUser.password, saltRound),
     });
     return `Register Complete`;
   }
 
   async changeUserPassword(
-    username: string,
+    email: string,
     changePasswordData: ChangePasswordDTO,
   ): Promise<string> {
     const saltRound = parseInt(this.configService.get<string>('SALT_ROUND'));
-    const user = await this.findUser(username);
+    const user = await this.findUser(email);
 
     if (
       !user ||
@@ -64,7 +64,7 @@ export class UserService {
       );
     }
     this.userRepository.update(
-      { username: username },
+      { email: email },
       {
         password: await bcrypt.hash(changePasswordData.newPassword, saltRound),
       },
@@ -74,7 +74,7 @@ export class UserService {
 
   async login(loginUser: UserDTO): Promise<AccessTokenDTO> {
     const accessToken = await this.authService.login(
-      loginUser.username,
+      loginUser.email,
       loginUser.password,
     );
 
@@ -85,7 +85,7 @@ export class UserService {
     }
   }
 
-  async projectList(username: string): Promise<Project[]> {
-    return await this.projectService.getUserProject(username);
+  async projectList(email: string): Promise<Project[]> {
+    return await this.projectService.getUserProject(email);
   }
 }

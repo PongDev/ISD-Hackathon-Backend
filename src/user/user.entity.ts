@@ -3,8 +3,11 @@ import { Entity, PrimaryColumn, Column } from 'typeorm';
 @Entity()
 export class User {
   @PrimaryColumn()
-  username: string;
+  email: string;
 
   @Column()
   password: string;
+
+  @Column()
+  displayName: string;
 }

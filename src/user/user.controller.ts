@@ -28,7 +28,7 @@ export class UserController {
     @Body() passwordData: ChangePasswordDTO,
   ) {
     return await this.userService.changeUserPassword(
-      req.user.username,
+      req.user.email,
       passwordData,
     );
   }
@@ -41,6 +41,6 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('projectList')
   async projectList(@Request() req) {
-    return await this.userService.projectList(req.user.username);
+    return await this.userService.projectList(req.user.email);
   }
 }

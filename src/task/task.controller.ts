@@ -20,16 +20,16 @@ export class TaskController {
 
   @Post('add')
   async addTask(@Request() req, @Body() taskData: AddTaskDTO) {
-    return await this.taskService.addTask(req.user.username, taskData);
+    return await this.taskService.addTask(req.user.email, taskData);
   }
 
   @Put('edit')
   async editTask(@Request() req, @Body() taskData: EditTaskDTO) {
-    return await this.taskService.editTask(req.user.username, taskData);
+    return await this.taskService.editTask(req.user.email, taskData);
   }
 
   @Delete('delete/:id')
   async deleteTask(@Request() req, @Param() params) {
-    return await this.taskService.deleteTask(req.user.username, params.id);
+    return await this.taskService.deleteTask(req.user.email, params.id);
   }
 }

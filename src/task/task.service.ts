@@ -14,14 +14,11 @@ export class TaskService {
     private projectService: ProjectService,
   ) {}
 
-  async addTask(username: string, addTaskData: AddTaskDTO): Promise<string> {
+  async addTask(email: string, addTaskData: AddTaskDTO): Promise<string> {
     const taskData = await this.taskRepository.findOne(addTaskData.projectID);
 
     if (
-      !this.projectService.isUserAllowAccessProject(
-        username,
-        taskData.projectID,
-      )
+      !this.projectService.isUserAllowAccessProject(email, taskData.projectID)
     ) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
@@ -29,14 +26,11 @@ export class TaskService {
     return 'Add Task Complete';
   }
 
-  async editTask(username: string, editTaskData: EditTaskDTO): Promise<string> {
+  async editTask(email: string, editTaskData: EditTaskDTO): Promise<string> {
     const taskData = await this.taskRepository.findOne(editTaskData.projectID);
 
     if (
-      !this.projectService.isUserAllowAccessProject(
-        username,
-        taskData.projectID,
-      )
+      !this.projectService.isUserAllowAccessProject(email, taskData.projectID)
     ) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
@@ -44,14 +38,11 @@ export class TaskService {
     return 'Edit Task Complete';
   }
 
-  async deleteTask(username: string, taskID: number): Promise<string> {
+  async deleteTask(email: string, taskID: number): Promise<string> {
     const taskData = await this.taskRepository.findOne(taskID);
 
     if (
-      !this.projectService.isUserAllowAccessProject(
-        username,
-        taskData.projectID,
-      )
+      !this.projectService.isUserAllowAccessProject(email, taskData.projectID)
     ) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
@@ -59,8 +50,8 @@ export class TaskService {
     return 'Delete Task Complete';
   }
 
-  async taskList(username: string, projectID: number): Promise<Task[]> {
-    if (!this.projectService.isUserAllowAccessProject(username, projectID)) {
+  async taskList(email: string, projectID: number): Promise<Task[]> {
+    if (!this.projectService.isUserAllowAccessProject(email, projectID)) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
     return await this.taskRepository.find({

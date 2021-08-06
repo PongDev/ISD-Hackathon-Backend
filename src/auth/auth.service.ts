@@ -13,26 +13,23 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, password: string) {
-    const user = await this.userService.findUser(username);
+  async validateUser(email: string, password: string) {
+    const user = await this.userService.findUser(email);
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      return user.username;
+      return user.email;
     } else {
       return null;
     }
   }
 
-  async login(
-    username: string,
-    password: string,
-  ): Promise<AccessTokenDTO | null> {
-    const loginUsername = await this.validateUser(username, password);
+  async login(email: string, password: string): Promise<AccessTokenDTO | null> {
+    const loginEmail = await this.validateUser(email, password);
 
-    if (loginUsername === null) {
+    if (loginEmail === null) {
       return null;
     } else {
-      const payload: PayloadDTO = { username: loginUsername };
+      const payload: PayloadDTO = { email: loginEmail };
 
       return {
         access_token: this.jwtService.sign(payload),

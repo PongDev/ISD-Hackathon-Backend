@@ -13,45 +13,45 @@ export class ProjectService {
   ) {}
 
   async createProject(
-    username: string,
+    email: string,
     createProjectData: CreateProjectDTO,
   ): Promise<string> {
-    if (!createProjectData.member.includes(username)) {
-      createProjectData.member.push(username);
+    if (!createProjectData.member.includes(email)) {
+      createProjectData.member.push(email);
     }
     await this.projectRepository.insert(createProjectData);
     return 'Create Project Complete';
   }
 
   async editProject(
-    username: string,
+    email: string,
     editProjectData: EditProjectDTO,
   ): Promise<string> {
     const projectData = await this.projectRepository.findOne(
       editProjectData.id,
     );
 
-    if (!projectData || !projectData.member.includes(username)) {
+    if (!projectData || !projectData.member.includes(email)) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
     this.projectRepository.update({ id: editProjectData.id }, editProjectData);
     return 'Edit Project Complete';
   }
 
-  async getUserProject(username: string): Promise<Project[]> {
-    console.log(username);
+  async getUserProject(email: string): Promise<Project[]> {
+    console.log(email);
     return (await this.projectRepository.find()).filter((e) => {
-      return e.member.includes(username);
+      return e.member.includes(email);
     });
   }
 
   async isUserAllowAccessProject(
-    username: string,
+    email: string,
     projectID: number,
   ): Promise<boolean> {
     const projectData = await this.projectRepository.findOne(projectID);
 
-    if (!projectData || !projectData.member.includes(username)) {
+    if (!projectData || !projectData.member.includes(email)) {
       return false;
     } else {
       return true;

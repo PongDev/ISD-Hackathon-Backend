@@ -25,22 +25,16 @@ export class ProjectController {
 
   @Post('create')
   async createProject(@Request() req, @Body() projectData: CreateProjectDTO) {
-    return await this.projectService.createProject(
-      req.user.username,
-      projectData,
-    );
+    return await this.projectService.createProject(req.user.email, projectData);
   }
 
   @Put('edit')
   async editProject(@Request() req, @Body() projectData: EditProjectDTO) {
-    return await this.projectService.editProject(
-      req.user.username,
-      projectData,
-    );
+    return await this.projectService.editProject(req.user.email, projectData);
   }
 
   @Get(':id')
   async listProjectTask(@Request() req, @Param() params): Promise<Task[]> {
-    return await this.taskService.taskList(req.user.username, params.id);
+    return await this.taskService.taskList(req.user.email, params.id);
   }
 }
