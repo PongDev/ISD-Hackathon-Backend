@@ -8,6 +8,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Task } from 'src/task/task.entity';
 import { TaskService } from 'src/task/task.service';
@@ -15,6 +16,8 @@ import { CreateProjectDTO } from './dto/create-project.dto';
 import { EditProjectDTO } from './dto/edit-project.dto';
 import { ProjectService } from './project.service';
 
+@ApiTags('project')
+@ApiBearerAuth()
 @Controller('project')
 @UseGuards(JwtAuthGuard)
 export class ProjectController {

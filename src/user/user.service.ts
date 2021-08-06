@@ -16,6 +16,7 @@ import { AccessTokenDTO } from '../auth/dto/access-token.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { ProjectService } from 'src/project/project.service';
 import { Project } from 'src/project/project.entity';
+import { UserLoginDTO } from './dto/user-login.dto';
 
 @Injectable()
 export class UserService {
@@ -43,6 +44,7 @@ export class UserService {
     await this.userRepository.insert({
       email: registerUser.email,
       password: await bcrypt.hash(registerUser.password, saltRound),
+      displayName: registerUser.displayName,
     });
     return `Register Complete`;
   }
@@ -72,7 +74,7 @@ export class UserService {
     return 'Change Password Complete';
   }
 
-  async login(loginUser: UserDTO): Promise<AccessTokenDTO> {
+  async login(loginUser: UserLoginDTO): Promise<AccessTokenDTO> {
     const accessToken = await this.authService.login(
       loginUser.email,
       loginUser.password,

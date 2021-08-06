@@ -8,11 +8,14 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { AddTaskDTO } from './dto/add-task.dto';
 import { EditTaskDTO } from './dto/edit-task.dto';
 import { TaskService } from './task.service';
 
+@ApiTags('task')
+@ApiBearerAuth()
 @Controller('task')
 @UseGuards(JwtAuthGuard)
 export class TaskController {
