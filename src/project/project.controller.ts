@@ -55,4 +55,13 @@ export class ProjectController {
   async listProjectTask(@Request() req, @Param() params): Promise<Task[]> {
     return await this.taskService.taskList(req.user.email, params.id);
   }
+
+  @Get(':id/assignTasks')
+  @ApiParam({ name: 'id', required: true })
+  async listProjectAssignTask(
+    @Request() req,
+    @Param() params,
+  ): Promise<Task[]> {
+    return await this.taskService.assignTaskList(req.user.email, params.id);
+  }
 }

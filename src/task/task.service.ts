@@ -83,6 +83,27 @@ export class TaskService {
     });
   }
 
+  async assignTaskList(email: string, projectID: number): Promise<Task[]> {
+    if (
+      !(await this.projectService.isUserAllowAccessProject(email, projectID))
+    ) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    return (
+      await this.taskRepository.find({
+        where: {
+          projectID: projectID,
+        },
+        order: {
+          dueDate: 'ASC',
+          priority: 'DESC',
+        },
+      })
+    ).filter((e) => {
+      return e.underTaker.includes(email);
+    });
+  }
+
   async removeProjectTask(projectID: number): Promise<void> {
     await this.taskRepository.delete({ projectID: projectID });
   }
