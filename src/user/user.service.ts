@@ -14,6 +14,8 @@ import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { AccessTokenDTO } from '../auth/dto/access-token.dto';
 import { AuthService } from 'src/auth/auth.service';
+import { ProjectService } from 'src/project/project.service';
+import { Project } from 'src/project/project.entity';
 
 @Injectable()
 export class UserService {
@@ -23,6 +25,7 @@ export class UserService {
     private userRepository: Repository<User>,
     @Inject(forwardRef(() => AuthService))
     private authService: AuthService,
+    private projectService: ProjectService,
   ) {}
 
   async findUser(username: string): Promise<User> {
@@ -80,5 +83,9 @@ export class UserService {
     } else {
       return accessToken;
     }
+  }
+
+  async projectList(username: string): Promise<Project[]> {
+    return await this.projectService.getUserProject(username);
   }
 }

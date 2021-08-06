@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Put,
   Request,
@@ -22,12 +23,24 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Put('changepassword')
-  changePassword(@Request() req, @Body() passwordData: ChangePasswordDTO) {
-    return this.userService.changeUserPassword(req.user.username, passwordData);
+  async changePassword(
+    @Request() req,
+    @Body() passwordData: ChangePasswordDTO,
+  ) {
+    return await this.userService.changeUserPassword(
+      req.user.username,
+      passwordData,
+    );
   }
 
   @Post('login')
-  login(@Body() loginUser: UserDTO) {
-    return this.userService.login(loginUser);
+  async login(@Body() loginUser: UserDTO) {
+    return await this.userService.login(loginUser);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('projectList')
+  async projectList(@Request() req) {
+    return await this.userService.projectList(req.user.username);
   }
 }
