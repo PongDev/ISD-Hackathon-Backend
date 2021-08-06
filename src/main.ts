@@ -12,16 +12,22 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
 
-  const document = SwaggerModule.createDocument(
-    app,
-    new DocumentBuilder()
-      .addBearerAuth()
-      .setTitle('ISD Hackathon')
-      .setDescription('ISD Hackathon Backend API Description')
-      .setVersion('1.0')
-      .build(),
-  );
-  SwaggerModule.setup('api', app, document);
+  if (configService.get<string>('ENABLE_SWAGGER_API') === 'true') {
+    const document = SwaggerModule.createDocument(
+      app,
+      new DocumentBuilder()
+        .addBearerAuth()
+        .setTitle('ISD Hackathon')
+        .setDescription('ISD Hackathon Backend API Description')
+        .setVersion('1.0')
+        .build(),
+    );
+    SwaggerModule.setup('api', app, document);
+  }
+
+  if (configService.get<string>('ALLOW_CROSS_ORIGIN') === 'true') {
+    app.enableCors();
+  }
 
   await app.listen(port);
 }
