@@ -55,7 +55,13 @@ export class TaskService {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
     return await this.taskRepository.find({
-      projectID: projectID,
+      where: {
+        projectID: projectID,
+      },
+      order: {
+        dueDate: 'ASC',
+        priority: 'DESC',
+      },
     });
   }
 }

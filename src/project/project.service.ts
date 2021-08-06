@@ -40,7 +40,14 @@ export class ProjectService {
 
   async getUserProject(email: string): Promise<Project[]> {
     console.log(email);
-    return (await this.projectRepository.find()).filter((e) => {
+    return (
+      await this.projectRepository.find({
+        order: {
+          dueDate: 'ASC',
+          priority: 'DESC',
+        },
+      })
+    ).filter((e) => {
       return e.member.includes(email);
     });
   }
